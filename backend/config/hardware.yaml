@@ -1,0 +1,116 @@
+# REAL HARDWARE, no GPS. Raspberry Pi 5 + L298N + HC-SR04 + IR + ESP32-CAM.
+# The rover starts DISARMED. Read docs/HARDWARE.md and docs/SAFETY.md first.
+# Validate: python -m rover --config config/hardware.yaml --check-config
+mode: hardware
+rover_name: survey-rover
+
+server:
+  host: 0.0.0.0
+  port: 8000
+  frontend_dist: ../frontend/dist
+
+auth:
+  enabled: false   # set true and export ROVER_AUTH_TOKEN for shared networks
+
+database:
+  path: data/rover.db
+
+gpio:
+  chip: auto       # RP1 header chip (gpiochip0 on current kernels, gpiochip4 on early Bookworm)
+
+motors:
+  driver: l298n
+  left:  {in_a: 17, in_b: 27, enable: 12, invert: false}
+  right: {in_a: 22, in_b: 23, enable: 13, invert: false}
+  pwm_frequency_hz: 1000
+  min_duty: 0.30
+  watchdog_timeout_s: 0.5
+
+motion:
+  max_output: 0.7          # start conservative; raise after testing
+  max_accel_per_s: 2.0
+  max_decel_per_s: 5.0
+  reversal_dwell_s: 0.3
+
+calibration:               # MEASURE THESE (docs/CALIBRATION.md)
+  full_speed_mps: 0.45
+  effective_track_m: 0.37
+  calibrated: false
+
+manual:
+  deadman_timeout_s: 0.35
+  max_continuous_s: 20
+  default_speed: 0.45
+  max_speed: 0.7
+
+safety:
+  obstacle_stop_distance_m: 0.30
+  obstacle_slow_distance_m: 0.60
+  obstacle_policy: pause
+  block_forward_on_sensor_invalid: true
+  required_for_arming: [front_ultrasonic]
+  auto_disarm_idle_s: 300
+  estop_input:
+    enabled: false         # set true once a physical e-stop switch is wired
+    pin: 26
+    active_low: true
+    pull: up
+
+localization:
+  provider: none           # no GPS / encoders installed
+
+sensors:
+  - id: front_ultrasonic
+    type: ultrasonic
+    label: Front ultrasonic (HC-SR04)
+    driver: hcsr04
+    trigger_pin: 24
+    echo_pin: 25           # 5 V Echo -> level shifter / divider -> GPIO25
+    max_range_m: 4.0
+    rate_hz: 12
+    mount: {x_m: 0.0, y_m: 0.12, yaw_deg: 0}
+    safety_role: front
+  - id: front_ir
+    type: ir_obstacle
+    label: Front IR
+    driver: gpio
+    pin: 16
+    active_low: true       # most modules pull OUT low on detection
+    pull: up
+    debounce_ms: 30
+    safety_role: front
+  # ---- optional / future devices: disabled until fitted ---------------------
+  - id: metal
+    type: metal_detector
+    driver: gpio_digital
+    pin: 5
+    enabled: false
+  - id: magnetometer
+    type: magnetometer
+    driver: external
+    adapter: "rover_adapters.my_magnetometer:MyMagnetometer"   # write when hardware is chosen
+    i2c_bus: 1
+    enabled: false
+  - id: battery
+    type: battery
+    driver: external
+    adapter: "rover_adapters.my_battery:MyBatteryMonitor"
+    enabled: false
+  - id: soc_temperature
+    type: temperature
+    label: Pi 5 SoC temperature
+    driver: linux_thermal
+    thermal_zone: 0
+
+camera:
+  provider: esp32cam
+  stream_url: http://192.168.1.60:81/stream
+  snapshot_url: http://192.168.1.60/capture
+
+vision:
+  enabled: false
+  backend: onnx
+  model_path: models/yolov8n.onnx
+  imgsz: 320
+  max_rate_hz: 2
+  event_classes: []        # COCO classes are not survey targets; leave empty unless validated

@@ -1,0 +1,42 @@
+# REAL HARDWARE with a GNSS receiver (NMEA over UART or USB).
+# Identical to hardware.yaml except for mode and localization.
+mode: hardware_gps
+rover_name: survey-rover
+
+database:
+  path: data/rover.db
+
+motors:
+  driver: l298n
+  left:  {in_a: 17, in_b: 27, enable: 12}
+  right: {in_a: 22, in_b: 23, enable: 13}
+
+motion:
+  max_output: 0.7
+
+localization:
+  provider: gps_nmea
+  gps:
+    port: /dev/ttyACM0       # USB receivers; /dev/ttyAMA0 for UART (enable in raspi-config)
+    baudrate: 9600
+    min_fix_quality: 1       # 4 = RTK fixed only
+    min_satellites: 6
+    max_hdop: 2.0
+    max_accuracy_m: 2.5      # reject fixes worse than this
+    max_fix_age_s: 2.0
+    cog_min_speed_mps: 0.15
+  loss_pause_s: 1.0
+  loss_abort_s: 60
+
+safety:
+  required_for_arming: [front_ultrasonic]
+
+sensors:
+  - {id: front_ultrasonic, type: ultrasonic, driver: hcsr04, trigger_pin: 24, echo_pin: 25, safety_role: front}
+  - {id: front_ir, type: ir_obstacle, driver: gpio, pin: 16, active_low: true, pull: up, safety_role: front}
+  - {id: soc_temperature, type: temperature, driver: linux_thermal}
+
+camera:
+  provider: esp32cam
+  stream_url: http://192.168.1.60:81/stream
+  snapshot_url: http://192.168.1.60/capture

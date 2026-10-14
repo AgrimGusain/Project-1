@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+body {
+  @apply bg-ink-900 text-fg antialiased;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .panel { @apply rounded-xl border border-ink-600/70 bg-ink-850 shadow-panel; }
+  .panel-head { @apply flex items-center justify-between gap-2 border-b border-ink-600/60 px-4 py-2.5; }
+  .panel-title { @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-muted; }
+  .panel-body { @apply p-4; }
+  .label { @apply mb-1 block text-xs font-medium text-fg-muted; }
+  .input {
+    @apply w-full rounded-lg border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-fg outline-none
+           transition focus:border-amber focus:ring-2 focus:ring-amber/25 disabled:opacity-50;
+  }
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-semibold
+           transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/60
+           disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-default { @apply border-ink-500 bg-ink-700 text-fg hover:bg-ink-600; }
+  .btn-primary { @apply border-amber bg-amber text-ink-950 hover:brightness-110; }
+  .btn-danger { @apply border-bad bg-bad/90 text-white hover:bg-bad; }
+  .btn-ghost { @apply border-transparent bg-transparent text-fg-muted hover:bg-ink-700 hover:text-fg; }
+  .btn-ok { @apply border-ok/60 bg-ok/15 text-ok hover:bg-ok/25; }
+  .kv { @apply flex items-baseline justify-between gap-3 py-1 text-sm; }
+  .kv > dt { @apply text-fg-muted; }
+  .kv > dd { @apply text-right font-mono text-fg; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide; }
+}
+
+.leaflet-container { background: #0e141b; font-family: inherit; border-radius: 0.75rem; }
+.leaflet-control-attribution { background: rgba(11, 15, 20, 0.7) !important; color: #8b98a9 !important; }
+.leaflet-control-attribution a { color: #c9d4df !important; }
+.leaflet-bar a { background: #141b24 !important; color: #e6edf3 !important; border-color: #243041 !important; }
+
+/* Hazard stripe for the e-stop latched banner */
+.hazard {
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 90, 95, 0.95) 0 14px, rgba(20, 8, 8, 0.95) 14px 28px);
+}
+.scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #243041; border-radius: 8px; }

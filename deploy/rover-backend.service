@@ -1,0 +1,24 @@
+[Unit]
+Description=Survey rover control backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@USER@
+Group=@USER@
+SupplementaryGroups=gpio dialout
+WorkingDirectory=@ROOT@/backend
+EnvironmentFile=-/etc/rover/rover.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=@ROOT@/backend/.venv/bin/python -m rover --config @CONFIG@
+# SIGINT triggers a graceful shutdown: motors are commanded to zero before exit.
+KillSignal=SIGINT
+TimeoutStopSec=10
+# Restart after a crash. The rover always restarts DISARMED and never resumes a mission.
+Restart=on-failure
+RestartSec=3
+Nice=-5
+
+[Install]
+WantedBy=multi-user.target

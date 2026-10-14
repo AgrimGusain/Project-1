@@ -1,0 +1,18 @@
+# Every optional device disabled. The application must still start, allow manual
+# simulated driving and grid/GPS planning. Used by the optional-hardware tests.
+mode: simulation
+database:
+  path: data/rover-minimal.db
+localization:
+  provider: none
+sensors:
+  - {id: front_ultrasonic, type: ultrasonic, driver: simulated, enabled: false}
+  - {id: front_ir, type: ir_obstacle, driver: simulated, enabled: false}
+  - {id: metal, type: metal_detector, driver: simulated, enabled: false}
+  - {id: magnetometer, type: magnetometer, driver: simulated, enabled: false}
+safety:
+  required_for_arming: []
+camera:
+  provider: none
+vision:
+  enabled: false

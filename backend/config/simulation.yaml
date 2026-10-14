@@ -1,0 +1,90 @@
+# Simulation: no GPIO, no motor power. Every simulated device is labelled as such.
+# Run: python -m rover --config config/simulation.yaml
+mode: simulation
+rover_name: survey-rover-sim
+
+database:
+  path: data/rover-sim.db
+
+calibration:
+  full_speed_mps: 0.45
+  effective_track_m: 0.37
+  calibrated: false
+  notes: "default model; the simulated chassis deliberately differs by speed_bias/turn_bias"
+
+# Mirrors the current hardware: no localization -> grid missions run open-loop.
+# Try "simulated" (ground truth) or "simulated_gps" (see simulation_gps.yaml).
+localization:
+  provider: none
+
+sensors:
+  - id: front_ultrasonic
+    type: ultrasonic
+    label: Front ultrasonic (HC-SR04)
+    driver: simulated
+    mount: {x_m: 0.0, y_m: 0.12, yaw_deg: 0}
+    safety_role: front
+  - id: front_ir
+    type: ir_obstacle
+    label: Front IR
+    driver: simulated
+    mount: {x_m: 0.0, y_m: 0.13, yaw_deg: 0}
+    safety_role: front
+  - id: metal
+    type: metal_detector
+    label: Metal detector (simulated)
+    driver: simulated
+    enabled: true
+  - id: magnetometer
+    type: magnetometer
+    label: Magnetometer (simulated, uncalibrated)
+    driver: simulated
+    enabled: true
+  - id: imu
+    type: imu
+    driver: simulated
+    enabled: false
+  - id: left_encoder
+    type: wheel_encoder
+    side: left
+    driver: simulated
+    enabled: false
+  - id: right_encoder
+    type: wheel_encoder
+    side: right
+    driver: simulated
+    enabled: false
+  - id: battery
+    type: battery
+    label: Battery (simulated)
+    driver: simulated
+    cells: 2
+  - id: soc_temperature
+    type: temperature
+    label: SoC temperature (simulated)
+    driver: simulated
+
+safety:
+  required_for_arming: [front_ultrasonic]
+  obstacle_policy: pause
+
+camera:
+  provider: simulated
+
+vision:
+  enabled: false          # set true after exporting models/yolov8n.onnx
+  model_path: models/yolov8n.onnx
+
+simulation:
+  speed_factor: 1.0
+  seed: 7
+  speed_bias: 0.03     # true chassis vs calibration model -> visible open-loop drift
+  turn_bias: 0.03
+  start_pose: {x: 0.35, y: 0.1, heading_deg: 0}
+  obstacles:
+    - {type: circle, x: 1.2, y: 6.5, r: 0.25}
+    - {type: rect, x: -2.0, y: 3.0, w: 0.6, h: 0.6}
+  metal_targets:
+    - {x: 1.1, y: 2.2, strength: 1.2, radius_m: 0.25}
+    - {x: 2.6, y: 3.6, strength: 0.8, radius_m: 0.2}
+  geo_origin: {lat: 12.9716, lon: 77.5946, alt: 900}

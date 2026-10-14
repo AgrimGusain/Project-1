@@ -1,0 +1,30 @@
+# Simulation with a SIMULATED GNSS receiver (RTK-like noise by default).
+# Exercises the GPS planning and GPS-guided execution path without any receiver.
+mode: simulation
+rover_name: survey-rover-sim-gps
+
+database:
+  path: data/rover-sim-gps.db
+
+localization:
+  provider: simulated_gps
+  gps:
+    max_accuracy_m: 0.5
+    min_fix_quality: 1
+
+sensors:
+  - {id: front_ultrasonic, type: ultrasonic, driver: simulated, safety_role: front}
+  - {id: front_ir, type: ir_obstacle, driver: simulated, safety_role: front}
+  - {id: metal, type: metal_detector, driver: simulated}
+  - {id: magnetometer, type: magnetometer, driver: simulated}
+  - {id: battery, type: battery, driver: simulated}
+
+camera:
+  provider: simulated
+
+simulation:
+  gps_noise_m: 0.03
+  start_pose: {x: 0, y: 0, heading_deg: 0}
+  geo_origin: {lat: 12.9716, lon: 77.5946, alt: 900}
+  metal_targets:
+    - {x: 3.0, y: 4.0, strength: 1.2}

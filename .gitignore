@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+backend/data/
+backend/models/*.onnx
+backend/models/*.pt
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Firmware secrets
+firmware/esp32cam_stream/config.h
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
